@@ -16,8 +16,8 @@ re_pt = re.compile(r'[\s\S]*[${]([\d-]+)d[_]pt[\s\S]*', re.S)  # 用于匹配d_p
 
 # 反向转化　
 re_pt_real = re.compile(r'[\s\S]*([\d]{8}000000)')
-re_yymmdd_real = re.compile(r'[\s\S]*([\d]{4}[\d]{2}[\d]{2})[\s\S]*')
-re_yy_mm_dd_real = re.compile(r'[\s\S]*([\d]{4}-[\d]{2}-[\d]{2})[\s\S]*')
+re_yymmdd_real = re.compile(r'[\s\S]*(20[\d]{2}[\d]{2}[\d]{2})[\s\S]*')
+re_yy_mm_dd_real = re.compile(r'[\s\S]*(20[\d]{2}-[\d]{2}-[\d]{2})[\s\S]*')
 
 
 def get_real_time(date_format, time_range):
