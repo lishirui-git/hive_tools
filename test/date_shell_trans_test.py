@@ -44,6 +44,7 @@ class DateShellTransTest(unittest.TestCase):
         dt_ins = DateShellTrans(test_sql)
         trans_res = dt_ins.replace_sql_pt_2_shell()
         test_file_out = './2-date_to_shell_sample_out.sql'
+
         # with open(os.path.join(test_sql_path, test_file_out), 'w') as f:
         #     f.write(trans_res)
         with open(os.path.join(test_sql_path, test_file_out), 'r') as f:
