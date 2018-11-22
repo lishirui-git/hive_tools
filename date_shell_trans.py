@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2018-11-17
 # @Author  : 殷帅
-# hive中的日期与shell格式日期的互相转换
+# hive中的日期与shell格式日期的互相转换  效率工具
 
 from time_util import *
 

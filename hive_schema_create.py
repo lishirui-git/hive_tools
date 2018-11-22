@@ -70,6 +70,7 @@ class HiveSchemaCreate:
             field_name = field_info_tuple[0][:field_info_tuple[0].find(',')]
             field_type = field_info_tuple[3]
             field_comment = field_info_tuple[2]
+            print field_comment
             field_info_ret.append([field_name, field_type, field_comment])
         return field_info_ret
 
@@ -93,10 +94,13 @@ class HiveSchemaCreate:
             field_name = key_info[0]
             field_type = key_info[1]
             field_comment = key_info[2]
-            schema_line = '    {}{} comment {}{}'.format(' ' if field_index == 1 else ',',
+            print field_comment
+            schema_line = '    {} {} {} comment {}'.format(' ' if field_index == 1 else ',',
                                                          field_name,
                                                          field_type,
-                                                         field_comment)
+                                                         unicode(field_comment, 'utf-8')
+                                                           )
+            print schema_line
             schema_ret = schema_ret + '\n' + schema_line
 
         schema_ret += '\n'
@@ -135,7 +139,7 @@ class HiveSchemaCreate:
                                                         field_name,
                                                         field_type,
                                                         self.get_mysql_default_info(field_type),
-                                                        field_comment)
+                                                        unicode(field_comment, 'utf-8'))
 
         mysql_head = "CREATE TABLE {} (".format(self.table_name)
         mysql_tail = """\n    ,PRIMARY KEY (`id`)\n) ENGINE=InnoDB CHARSET=utf8mb4 COMMENT '{}'
@@ -147,7 +151,8 @@ if __name__ == '__main__':
     sql = ""
     with open('./sample.sql', 'r') as f:
         sql = f.read().strip()
-    print sql
+    # print sql
+    import sys
     hive_util = HiveSchemaCreate('rpt.rpt_nh_info_da', sql, '这个是mysql的中文名子')
     # print hive_util.hive_sql_to_mysql_scheme()
 
