@@ -4,7 +4,9 @@
 # @Author  : 殷帅
 # hive中的日期与shell格式日期的互相转换  效率工具
 
+
 from time_util import *
+__author__ = 'yinshuai'
 
 
 class DateShellTrans:
@@ -57,6 +59,15 @@ class DateShellTrans:
             real_date = re.findall(re_yy_mm_dd_real, sql_line)[0]
             ranges = cal_timedelta(get_format_now('%Y-%m-%d'), real_date, '%Y-%m-%d')
             sql_line = sql_line.replace(real_date, '${%dd_yyyy-MM-dd}' % ranges)
+        while re.findall(re_yymm_real, sql_line):
+            real_date = re.findall(re_yymm_real, sql_line)[0]
+            ranges = cal_month_delta(real_date, '%Y%m')
+            sql_line = sql_line.replace(real_date, '${%dM_yyyyMM}' % ranges)
+        while re.findall(re_yy_mm_real, sql_line):
+            real_date = re.findall(re_yy_mm_real, sql_line)[0]
+            ranges = cal_month_delta(real_date, '%Y-%m')
+            sql_line = sql_line.replace(real_date, '${%dM_yyyy-MM}' % ranges)
+
         return sql_line
 
     def replace_sql_shell_flag(self):
@@ -109,8 +120,16 @@ class DateShellTrans:
         return sql_line
 
 
+
+
+
+
+
 if __name__ == '__main__':
-    test_file = './sample1.sql'
+
+
+    test_file = './sample.sql'
+
     sql = ""
     with open(test_file, 'r') as f:
         sql = f.read()

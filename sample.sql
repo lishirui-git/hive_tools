@@ -35,7 +35,7 @@ case when status=0 then '待处理'
 ctime as qiangdantime,
 case when call_reply_time='2018-01-01 00:00:00' then ''
      else call_reply_time end as call_reply_time,
-case when im_reply_time='2018-01-01 00:00:00' then ''
+case when im_reply_time='201811' then ''
      else im_reply_time end as im_reply_time
 FROM ods.ods_lianjia_newhouse_service_apollo_link_business_chance_success_da
 WHERE
