@@ -7,12 +7,6 @@ import re
 __author__ = 'yinshuai'
 
 
-re_field_info = re.compile(r'([\s\S][^-]*)([-]+)(.*?)[(](.*?)[)]', re.S)  #最小匹配带着最后的类型的
-re_field_info_not_type = re.compile(r'([\s\S][^-]*)([-]+)(.*)', re.S) #　 最小匹配并且用户未定义字段类型的
-
-re_select_from = r'select([\s\S]*)from'
-re_comment = r'([\s\S]*) --([\s\S]*)[(][\s\S][)]'
-
 re_yymmdd = re.compile(r'[\s\S]*[${]([\d-]+)d[_]yyyymmdd[}][\s\S]*', re.S)   # 用于匹配yyyyMMdd格式数据
 re_yy_mm_dd = re.compile(r'[\s\S]*[${]([\d-]+)d[_]yyyy-mm-dd[}][\s\S]*', re.S)  # 用于匹配yyyy-MM-dd格式数据
 re_pt = re.compile(r'[\s\S]*[${]([\d-]+)d[_]pt[\s\S]*', re.S)  # 用于匹配d_pt格式数据
