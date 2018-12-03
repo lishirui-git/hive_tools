@@ -4,6 +4,7 @@
 # @Author  : 殷帅
 # hive中的日期与shell格式日期的互相转换  效率工具
 
+
 from time_util import *
 import sys
 
@@ -24,6 +25,8 @@ re_yymmdd_real = re.compile(r'[\s\S]*[^"](20[\d]{2}[\d]{2}[\d]{2})[\s\S]*')
 re_yy_mm_dd_real = re.compile(r'[\s\S]*[^"](20[\d]{2}-[\d]{2}-[\d]{2})[\s\S]*')
 re_yy_mm_real = re.compile(r'[\s\S]*[^"](20[\d]{2}-[\d]{2})[\'][\s\S]*')  # 匹配yyyy-MM格式
 
+
+__author__ = 'yinshuai'
 
 
 class DateShellTrans:
@@ -83,6 +86,15 @@ class DateShellTrans:
             ranges = cal_timedelta(get_format_now('%Y-%m'), real_date, '%Y-%m')
             print ranges
             break
+        while re.findall(re_yymm_real, sql_line):
+            real_date = re.findall(re_yymm_real, sql_line)[0]
+            ranges = cal_month_delta(real_date, '%Y%m')
+            sql_line = sql_line.replace(real_date, '${%dM_yyyyMM}' % ranges)
+        while re.findall(re_yy_mm_real, sql_line):
+            real_date = re.findall(re_yy_mm_real, sql_line)[0]
+            ranges = cal_month_delta(real_date, '%Y-%m')
+            sql_line = sql_line.replace(real_date, '${%dM_yyyy-MM}' % ranges)
+
         return sql_line
 
     def replace_sql_shell_flag(self):
@@ -133,6 +145,11 @@ class DateShellTrans:
             print shell_origin
             sql_line = sql_line.lower().replace(shell_origin, real_time)
         return sql_line
+
+
+
+
+
 
 
 if __name__ == '__main__':
