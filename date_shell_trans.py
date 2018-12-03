@@ -5,6 +5,25 @@
 # hive中的日期与shell格式日期的互相转换  效率工具
 
 from time_util import *
+import sys
+
+import re
+
+
+re_select_from = r'[\s\S]*SELECT([\s\S]*)FROM[\s\S]*'
+re_comment = r'([\s\S]*) --([\s\S]*)[(][\s\S][)]'
+
+re_yymmdd = re.compile(r'[\s\S]*[${]([\d-]+)d[_]yyyymmdd[}][\s\S]*', re.S)   # 用于匹配yyyyMMdd格式数据
+re_yy_mm_dd = re.compile(r'[\s\S]*[${]([\d-]+)d[_]yyyy-mm-dd[}][\s\S]*', re.S)  # 用于匹配yyyy-MM-dd格式数据
+re_pt = re.compile(r'[\s\S]*[${]([\d-]+)d[_]pt[\s\S]*', re.S)  # 用于匹配d_pt格式数据
+
+
+# 反向转化　
+re_pt_real = re.compile(r'[\s\S]*[^"]([\d]{8}000000)')
+re_yymmdd_real = re.compile(r'[\s\S]*[^"](20[\d]{2}[\d]{2}[\d]{2})[\s\S]*')
+re_yy_mm_dd_real = re.compile(r'[\s\S]*[^"](20[\d]{2}-[\d]{2}-[\d]{2})[\s\S]*')
+re_yy_mm_real = re.compile(r'[\s\S]*[^"](20[\d]{2}-[\d]{2})[\'][\s\S]*')  # 匹配yyyy-MM格式
+
 
 
 class DateShellTrans:
@@ -57,6 +76,13 @@ class DateShellTrans:
             real_date = re.findall(re_yy_mm_dd_real, sql_line)[0]
             ranges = cal_timedelta(get_format_now('%Y-%m-%d'), real_date, '%Y-%m-%d')
             sql_line = sql_line.replace(real_date, '${%dd_yyyy-MM-dd}' % ranges)
+
+        while re.findall(re_yy_mm_real, sql_line):
+            real_date = re.findall(re_yy_mm_real, sql_line)[0]
+            print real_date
+            ranges = cal_timedelta(get_format_now('%Y-%m'), real_date, '%Y-%m')
+            print ranges
+            break
         return sql_line
 
     def replace_sql_shell_flag(self):
@@ -110,6 +136,10 @@ class DateShellTrans:
 
 
 if __name__ == '__main__':
+    sql = "where time = '2018-09'"
+    dt = DateShellTrans(sql)
+    dt.replace_sql_pt_2_shell()
+    sys.exit(0)
     test_file = './sample1.sql'
     sql = ""
     with open(test_file, 'r') as f:
@@ -120,6 +150,7 @@ if __name__ == '__main__':
     print trans_sql
     with open('./res.sql', 'w') as f:
         f.write(trans_sql)
+
 
 
 #  需要添加一些单元测试用例　

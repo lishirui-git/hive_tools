@@ -24,10 +24,16 @@ settings = {
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("Hello, world")
+        self.render('test.html')
 
 
 class TransHandler(tornado.web.RequestHandler):
+
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*") # 这个地方可以写域名
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
     def post(self):
         sql = self.get_argument("sql", "")
         oper = self.get_argument("oper", "")
@@ -37,7 +43,7 @@ class TransHandler(tornado.web.RequestHandler):
             ret = dtrans.replace_sql_shell_flag()
         elif oper == 'date_to_shell':
             ret = dtrans.replace_sql_pt_2_shell()
-        self.write(ret.encode('utf-8'))
+        self.write({"ret": ret.encode('utf-8')})
 
     def get(self):
         sql = self.get_argument("sql", "")
@@ -48,13 +54,14 @@ class TransHandler(tornado.web.RequestHandler):
             ret = dtrans.replace_sql_shell_flag()
         elif oper == 'date_to_shell':
             ret = dtrans.replace_sql_pt_2_shell()
-        self.write(ret.encode('utf-8'))
+        self.write(str({"ret": ret.encode('utf-8')}))
 
 class CreateSchemaHandler(tornado.web.RequestHandler):
     def post(self):
         sql = self.get_argument("sql", "")
-        self.write(sql)
-        hive_util = HiveSchemaCreate('rpt.rpt_nh_info_da', sql, '这个是mysql的中文名子')
+        return self.write(sql)
+        print sql
+        hive_util = HiveSchemaCreate(sql)
         # print hive_util.hive_sql_to_mysql_scheme()
         hive_schema = hive_util.hive_sql_to_hive_schema()
         self.write(hive_schema)

@@ -3,23 +3,29 @@
 # @Time    : 2018-11-17
 # @Author  : 殷帅
 from time_util import *
+import re
+re_table_name = r'[\s\S]*表名:[\s]*([\w_]+)'  # ([a-zA-Z_]+)
+re_table_name_zh = r'[\s\S]*表中文名:[\s]*([\s\S]+)'  # ([a-zA-Z_]+)
+re_field_info = re.compile(r'([\s\S][^-]*)([-]+)(.*?)[(](.*?)[)]', re.S) #最小匹配带着最后的类型的
+re_field_info_not_type = re.compile(r'([\s\S][^-]*)([-]+)(.*)', re.S) #　最小匹配并且用户未定义字段类型的
 
 
 class HiveSchemaCreate:
 
-    def __init__(self, table_name="", hive_sql="", table_name_zh=""):
+    def __init__(self, hive_sql=""):
         """
         类初始化函数
         :param table_name: 表英文名称
         :param hive_sql:
         :param table_name_zh: 表中文名称(可选值)
         """
-        self.table_name = table_name
-        self.table_name_zh = table_name_zh
+        self.table_name = ""
+        self.table_name_zh = ""
         self.hive_sql = hive_sql
         self.hive_schema = ""
         self.mysql_schema = ""
         self.field_key_info = self.get_field_key_info()
+        self.get_table_name()
 
     @staticmethod
     def get_mysql_default_info(self, field_type):
@@ -44,33 +50,60 @@ class HiveSchemaCreate:
         """
         pass
 
+    def get_table_name(self):
+        """
+         获取表的中文名和英文名字
+         :param
+         :return: (表英文名,表中文名字)
+        """
+        try:
+            ret = re.match(re_table_name, self.hive_sql, re.M | re.I)  # match 从开头开始匹配
+            table_name = ret.groups(1)[0]
+        except:
+            raise ValueError('表的英文名字未正常解析')
+
+        try:
+            ret = re.match(re_table_name_zh, self.hive_sql, re.M | re.I)  # match 从开头开始匹配
+            table_name_zh = ret.groups(1)[0]
+        except:
+            raise ValueError('表的英文名字未正常解析')
+        self.table_name = table_name
+        self.table_name_zh = table_name_zh
+
     def get_field_key_info(self):
         """
         获取输入hive_sql中非关键信息(字段名称、字段类型、字段备注
         :return: [[字段名称, 字段类型, 字段备注],[]]
         """
         ret = re.match(re_select_from, self.hive_sql, re.M | re.I)  # match 从开头开始匹配
+        print '-----------------------'
+
         field_str = str(ret.groups(1))[2:-3]
         field_arr = field_str.split('\\n')
         field_info_ret = []
 
+
         for field_info in field_arr:
-            field_info = field_info.strip()
+            # field_info = field_info.strip()
+            # print "field info is " + field_info
             if field_info == '':
                 continue
             try:
                 field_info_tuple = re.findall(re_field_info, field_info)
+                # print "field tuple is " + str(field_info_tuple) + '\n'
             except Exception, e:
                 try:
                     field_info_tuple = re.findall(re_field_info_not_type, field_info)
+
                 except Exception, e:
                     error_info = '{}, {}数据行异常'.format(e, field_info)
                     raise ValueError(error_info)
             field_info_tuple = field_info_tuple[0]
+            if field_info_tuple == 'FROM(':
+                continue
             field_name = field_info_tuple[0][:field_info_tuple[0].find(',')]
             field_type = field_info_tuple[3]
             field_comment = field_info_tuple[2]
-            print field_comment
             field_info_ret.append([field_name, field_type, field_comment])
         return field_info_ret
 
@@ -94,19 +127,23 @@ class HiveSchemaCreate:
             field_name = key_info[0]
             field_type = key_info[1]
             field_comment = key_info[2]
-            print field_comment
-            schema_line = '    {} {} {} comment {}'.format(' ' if field_index == 1 else ',',
-                                                         field_name,
-                                                         field_type,
-                                                         unicode(field_comment, 'utf-8')
+            # print field_comment
+            schema_line = "    {} {} {} comment '{}'".format(' ' if field_index == 1 else ',',
+                                                         field_name.strip(),
+                                                         field_type.strip(),
+                                                         field_comment.strip()
                                                            )
-            print schema_line
+            # print schema_line
             schema_ret = schema_ret + '\n' + schema_line
 
         schema_ret += '\n'
-        schema_head = "create external table if not exists {} (".format(self.table_name)
-        table_layer = self.table_name.split('.')[0]
-        table_name = self.table_name.split('.')[1]
+        schema_head = "create external table if not exists '{}' (".format(self.table_name)
+        if '.' in self.table_name:
+            table_layer = self.table_name.split('.')[0]
+            table_name = self.table_name.split('.')[1]
+        else:
+            table_layer = self.table_name[:self.table_name.find('_')]
+            table_name = self.table_name
         schema_tail = """
           )partitioned by (pt string)
           row format delimited 
@@ -151,9 +188,11 @@ if __name__ == '__main__':
     sql = ""
     with open('./sample.sql', 'r') as f:
         sql = f.read().strip()
-    # print sql
-    import sys
-    hive_util = HiveSchemaCreate('rpt.rpt_nh_info_da', sql, '这个是mysql的中文名子')
-    # print hive_util.hive_sql_to_mysql_scheme()
+    print sql
+    hive_util = HiveSchemaCreate(sql)
+    print hive_util.get_field_key_info()
+    #
 
-    print hive_util.hive_sql_to_hive_schema()
+    # print hive_util.hive_sql_to_hive_schema()
+    # # print hive_util.get_table_name()
+    print hive_util.hive_sql_to_mysql_scheme()

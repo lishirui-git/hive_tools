@@ -1,0 +1,186 @@
+<style>
+#leave-message-textarea-left{
+    width: 45%;
+    min-height:500px;
+    max-height:500px;
+    outline: 0;
+    border: 1px solid #000;
+    font-size: 13px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    float: left;
+    -webkit-user-modify: read-write-plaintext-only;
+}
+#leave-message-textarea-right{
+    width: 45%;
+    min-height:500px;
+    max-height:500px;
+    outline: 0;
+    border: 1px solid #000;
+    font-size: 13px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    float: right;
+
+    -webkit-user-modify: read-write-plaintext-only;
+}
+ .bu{
+    margin-left: 15px;
+    margin-right: 15px;
+    float: left;
+
+ }
+
+</style>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>小工具内测版</title>
+</head>
+<body>
+<center>
+<button class="bu" id="clear-input">清空输入</button>
+<button class="bu" id="trans_to_shell">转shell日期</button>
+<button class="bu" id="trans_to_date">转具体日期</button>
+<button class="bu" id="create_hive_sch">生成Hive建表语句</button>
+<button class="bu" id="create_mysql_sch">生成mysql建表语句</button></center>
+<button class="bu" id="clear-output">清空输出</button>
+<br/><br/>
+
+<div id="leave-message-textarea-left" contenteditable="true"  placeholder="输入内容">输入内容</div>
+
+
+<div id="leave-message-textarea-right" contenteditable="true" data-text="输出内容">输出内容</div>
+
+</body>
+</html>
+
+
+
+
+　　<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+<script>
+    $("#trans_to_shell").click(function(){
+
+   //获取输入框中的内容
+      sql = $("#leave-message-textarea-left").html();
+            $('#leave-message-textarea-right').html("");
+           $.ajax({
+            type: "POST",
+            url: "http://10.33.150.254:8902/date_shell_trans",
+            dataType:"json",
+            data: {sql:sql, "oper" : "date_to_shell"},
+            success: function(data){
+                 // console.log(data.ret)
+                $('#leave-message-textarea-right').html(data.ret)
+            },
+            error:function(response){
+                alert("error");
+                }
+     })
+
+   })
+
+
+
+
+
+    $("#trans_to_date").click(function(){
+
+   //获取输入框中的内容
+      sql = $("#leave-message-textarea-left").html();
+            $('#leave-message-textarea-right').html("");
+           $.ajax({
+            type: "POST",
+            url: "http://10.33.150.254:8902/date_shell_trans",
+            dataType:"json",
+            data: {sql:sql, "oper" : "shell_to_date"},
+            success: function(data){
+                 // console.log(data.ret)
+                $('#leave-message-textarea-right').html(data.ret)
+            },
+            error:function(response){
+                alert("error");
+                }
+     })
+
+   })
+
+
+
+
+  // 生成Hive建表语句
+    $("#create_hive_sch").click(function(){
+
+   //获取输入框中的内容
+      sql = $("#leave-message-textarea-left").html();
+            $('#leave-message-textarea-right').html("");
+           $.ajax({
+            type: "POST",
+            url: "http://10.33.150.254:8902/date_shell_trans",
+            dataType:"json",
+            data: {sql:sql, "oper" : "shell_to_date"},
+            success: function(data){
+                 // console.log(data.ret)
+                $('#leave-message-textarea-right').html(data.ret)
+            },
+            error:function(response){
+                alert("error");
+                }
+     })
+
+   })
+
+
+
+
+
+
+  //生成Mysql建表语句
+    $("#create_mysql_sch").click(function(){
+
+   //获取输入框中的内容
+      sql = $("#leave-message-textarea-left").html();
+            $('#leave-message-textarea-right').html("");
+           $.ajax({
+            type: "POST",
+            url: "http://10.33.150.254:8902/date_shell_trans",
+            dataType:"json",
+            data: {sql:sql, "oper" : "shell_to_date"},
+            success: function(data){
+                 // console.log(data.ret)
+                $('#leave-message-textarea-right').html(data.ret)
+            },
+            error:function(response){
+                alert("error");
+                }
+     })
+
+   })
+
+
+
+
+
+
+  // 清空输入框
+    $("#clear-input").click(function(){
+      $("#leave-message-textarea-left").html("");
+   })
+
+  // 清空输出框
+    $("#clear-output").click(function(){
+      $("#leave-message-textarea-right").html("");
+   })
+
+   // 生成建表语句  of hive
+
+
+
+
+
+
+</script>
