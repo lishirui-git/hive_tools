@@ -48,23 +48,26 @@ class TransHandler(tornado.web.RequestHandler):
     def get(self):
         sql = self.get_argument("sql", "")
         oper = self.get_argument("oper", "date_to_shell")
-        # sql = tornado.escape.utf8(sql)  # uicode to utf8  escape 和 encode公用会出问题,后面看看原因
+        # sql = tornado.escape.utf8(sql)  # uicode to utf8  escape 和 en                                                                                 code公用会出问题,后面看看原因
         dtrans = DateShellTrans(sql)
         if oper == 'shell_to_date':
             ret = dtrans.replace_sql_shell_flag()
         elif oper == 'date_to_shell':
             ret = dtrans.replace_sql_pt_2_shell()
-        self.write(str({"ret": ret.encode('utf-8')}))
+        self.finish(str({"ret": ret}))
 
 class CreateSchemaHandler(tornado.web.RequestHandler):
     def post(self):
         sql = self.get_argument("sql", "")
-        return self.write(sql)
-        print sql
+        action = self.get_argument("action", "")
+        sql = sql.encode('utf-8')
         hive_util = HiveSchemaCreate(sql)
         # print hive_util.hive_sql_to_mysql_scheme()
-        hive_schema = hive_util.hive_sql_to_hive_schema()
-        self.write(hive_schema)
+        if action == 'get_hive':
+            schema = hive_util.hive_sql_to_hive_schema()
+        elif action == 'get_mysql':
+            schema = hive_util.hive_sql_to_mysql_scheme()
+        self.write({"ret": schema})
 
 
 def make_app():

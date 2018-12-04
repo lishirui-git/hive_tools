@@ -120,9 +120,9 @@
             $('#leave-message-textarea-right').html("");
            $.ajax({
             type: "POST",
-            url: "http://10.33.150.254:8902/date_shell_trans",
+            url: "http://10.33.150.254:8902/create_schema",
             dataType:"json",
-            data: {sql:sql, "oper" : "shell_to_date"},
+            data: {sql:sql, action:'get_hive'},
             success: function(data){
                  // console.log(data.ret)
                 $('#leave-message-textarea-right').html(data.ret)
@@ -147,9 +147,9 @@
             $('#leave-message-textarea-right').html("");
            $.ajax({
             type: "POST",
-            url: "http://10.33.150.254:8902/date_shell_trans",
+            url: "http://10.33.150.254:8902/create_schema",
             dataType:"json",
-            data: {sql:sql, "oper" : "shell_to_date"},
+            data: {sql:sql, "action" : "get_mysql"},
             success: function(data){
                  // console.log(data.ret)
                 $('#leave-message-textarea-right').html(data.ret)
